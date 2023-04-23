@@ -1,3 +1,4 @@
+from typing import Iterable
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -26,3 +27,6 @@ class Order:
 
     def __repr__(self) -> str:
         return str(self)
+
+
+OrderBatch = Iterable[Order]
