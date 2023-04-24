@@ -1,6 +1,10 @@
 import pandas as pd
 
 
+Candle = pd.DataFrame
+"""Represents one row of Candles."""
+
+
 Candles = pd.DataFrame
 """
 Represents a series of candle bars.

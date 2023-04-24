@@ -3,25 +3,25 @@ from datetime import datetime
 
 import pandas as pd
 
-from ctOS.kernel.Candles import Candles
+from ctOS.kernel.Candles import Candle, Candles
 
 
 def candles(klines: list[dict[str, Any]]) -> Candles:
     """
     [
         {
-            1591258320000,          // Open time
-            "9640.7",               // Open
-            "9642.4",               // High
-            "9640.6",               // Low
-            "9642.0",               // Close (or latest price)
-            "206",                  // Volume
-            1591258379999,          // Close time
-            "2.13660389",           // Base asset volume
-            48,                     // Number of trades
-            "119",                  // Taker buy volume
-            "1.23424865",           // Taker buy base asset volume
-            "0"                     // Ignore.
+            1591258320000,  # Open time
+            "9640.7",       # Open
+            "9642.4",       # High
+            "9640.6",       # Low
+            "9642.0",       # Close (or latest price)
+            "206",          # Volume
+            1591258379999,  # Close time
+            "2.13660389",   # Base asset volume
+            48,             # Number of trades
+            "119",          # Taker buy volume
+            "1.23424865",   # Taker buy base asset volume
+            "0"             # Ignore.
         }
     ]
     """
@@ -65,25 +65,25 @@ def candles(klines: list[dict[str, Any]]) -> Candles:
     return df
 
 
-def candle(kline: dict[str, Any]) -> Candles:
+def candle(kline: dict[str, Any]) -> Candle:
     """
     {
-        "t":1591261500000,      // Kline start time
-        "T":1591261559999,      // Kline close time
-        "i":"1m",               // Interval
-        "f":606400,             // First trade ID
-        "L":606430,             // Last trade ID
-        "o":"9638.9",           // Open price
-        "c":"9639.8",           // Close price
-        "h":"9639.8",           // High price
-        "l":"9638.6",           // Low price
-        "v":"156",              // volume
-        "n":31,                 // Number of trades
-        "x":false,              // Is this kline closed?
-        "q":"1.61836886",       // Base asset volume
-        "V":"73",               // Taker buy volume
-        "Q":"0.75731156",       // Taker buy base asset volume
-        "B":"0"                 // Ignore
+        "t":1591261500000,  # Kline start time
+        "T":1591261559999,  # Kline close time
+        "i":"1m",           # Interval
+        "f":606400,         # First trade ID
+        "L":606430,         # Last trade ID
+        "o":"9638.9",       # Open price
+        "c":"9639.8",       # Close price
+        "h":"9639.8",       # High price
+        "l":"9638.6",       # Low price
+        "v":"156",          # volume
+        "n":31,             # Number of trades
+        "x":false,          # Is this kline closed?
+        "q":"1.61836886",   # Base asset volume
+        "V":"73",           # Taker buy volume
+        "Q":"0.75731156",   # Taker buy base asset volume
+        "B":"0"             # Ignore
     }
     """
 

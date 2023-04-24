@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 pandas = "*"
 numpy = "*"
-python-binance = "*"
+binance-futures-connector = "*"
 
 [dev-packages]
 ipykernel = "*"
