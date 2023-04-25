@@ -1,12 +1,12 @@
-from typing import Any
 from datetime import datetime
 
 import pandas as pd
 
 from ctOS.std.Candles import Candle, Candles
+from . import JSON
 
 
-def candles(klines: list[dict[str, Any]]) -> Candles:
+def candles(klines: JSON.ObjectList) -> Candles:
     """
     [
         {
@@ -65,7 +65,7 @@ def candles(klines: list[dict[str, Any]]) -> Candles:
     return df
 
 
-def candle(kline: dict[str, Any]) -> Candle:
+def candle(kline: JSON.Object) -> Candle:
     """
     {
         "t":1591261500000,  # Kline start time

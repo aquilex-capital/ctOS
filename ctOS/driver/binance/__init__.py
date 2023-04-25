@@ -1,34 +1,15 @@
 from __future__ import annotations
 import logging as log
-from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 from binance.um_futures import UMFutures
 from binance.websocket.um_futures.websocket_client import UMFuturesWebsocketClient
 
 from ctOS.std.Candles import Candle, Candles
 from . import normalize
-
-
-class Interval(Enum):
-    INTERVAL_1MINUTE = "1m"
-    INTERVAL_3MINUTE = "3m"
-    INTERVAL_5MINUTE = "5m"
-    INTERVAL_15MINUTE = "15m"
-    INTERVAL_30MINUTE = "30m"
-    INTERVAL_1HOUR = "1h"
-    INTERVAL_2HOUR = "2h"
-    INTERVAL_4HOUR = "4h"
-    INTERVAL_6HOUR = "6h"
-    INTERVAL_8HOUR = "8h"
-    INTERVAL_12HOUR = "12h"
-    INTERVAL_1DAY = "1d"
-    INTERVAL_3DAY = "3d"
-    INTERVAL_1WEEK = "1w"
-    INTERVAL_1MONTH = "1M"
-
-    def __str__(self) -> str:
-        return self.value
+from .interval import Interval
+from .CandleStreamFilter import CandleStreamFilter
+from . import JSON
 
 
 class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
@@ -59,15 +40,15 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
         symbol: str,
         interval: Interval,
         callback: Callable[[Candle], None],
-        filter: Callable[[Candle], bool] = lambda _: True,
+        filter: CandleStreamFilter = lambda _: True,
     ) -> None:
-        def is_ok(event: dict[str, Any]) -> bool:
+        def is_ok(event: JSON.Object) -> bool:
             event_type = "e"
             return event.get(event_type, None) == "kline"
 
-        def middleware(event: dict[str, Any]) -> None:
-            if is_ok(event) and filter(candle := normalize.candle(event["k"])):
-                callback(candle)
+        def middleware(event: JSON.Object) -> None:
+            if is_ok(event) and filter(kline := event["k"]):
+                callback(normalize.candle(kline))
             else:
                 log.warning("skipping candle stream event: " + str(event))
 
@@ -77,3 +58,18 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             interval=str(interval),
             callback=middleware,
         )
+
+    def open_positions(
+        self, symbol: str = None
+    ) -> tuple[JSON.ObjectList, JSON.ObjectList]:
+        all_open = [
+            position
+            for position in self.account()["positions"]
+            if float(position["positionAmt"]) != 0
+        ]
+        open_for_symbol = (
+            [position for position in all_open if position["symbol"] == symbol]
+            if symbol
+            else []
+        )
+        return all_open, open_for_symbol

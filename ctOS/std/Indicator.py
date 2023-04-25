@@ -1,13 +1,10 @@
 from __future__ import annotations
-from typing import Callable, Iterator, Iterable
+from typing import Iterator, Iterable
 from dataclasses import dataclass
 
 import numpy as np
 
 from .Candles import Candles, IndicativeCandles
-
-
-IndicatorFunction = Callable[[Candles], IndicativeCandles]
 
 
 @dataclass(unsafe_hash=True)
@@ -29,9 +26,7 @@ class Indicator:
         `IndicativeCandles` combine the original `Candles` columns with the
         columns provided by a concrete subclass of `Indicator`.
 
-        NOTE 1: this method follows the signature of the `IndicatorFunction`.
-
-        NOTE 2: `Indicator`s must never mutate the original `Candles` instance.
+        NOTE: `Indicator`s must never mutate the original `Candles` instance.
         """
         raise NotImplementedError
 
