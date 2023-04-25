@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from ctOS.kernel.Candles import Candle, Candles
+from ctOS.std.Candles import Candle, Candles
 
 
 def candles(klines: list[dict[str, Any]]) -> Candles:

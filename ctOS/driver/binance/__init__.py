@@ -6,7 +6,7 @@ from typing import Any, Callable, Optional
 from binance.um_futures import UMFutures
 from binance.websocket.um_futures.websocket_client import UMFuturesWebsocketClient
 
-from ctOS.kernel.Candles import Candle, Candles
+from ctOS.std.Candles import Candle, Candles
 from . import normalize
 
 
@@ -29,9 +29,6 @@ class Interval(Enum):
 
     def __str__(self) -> str:
         return self.value
-
-    def __repr__(self) -> str:
-        return str(self)
 
 
 class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
@@ -57,7 +54,7 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             )
         )
 
-    def candle_stream(
+    def stream_candles(
         self,
         symbol: str,
         interval: Interval,

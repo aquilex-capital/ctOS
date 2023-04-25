@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Callable, Iterator, Iterable
 from dataclasses import dataclass
-import traceback
 
 import numpy as np
 
@@ -21,14 +20,7 @@ class Indicator:
     ## Overview
 
     `Indicator`s provide additional quantitative information about the `Candles`
-    series commonly used by the `Signal`s.
-
-    ## Functional Composition
-
-    ```
-    indicator1 >> indicator2  # 1 then 2
-    indicator1 << indicator2  # 2 then 1
-    ```
+    series commonly used by the `Predicate`s.
     """
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
@@ -45,6 +37,58 @@ class Indicator:
 
 
 class IndicatorBatch:
+    """
+    ## Overview
+
+    The `Indicator`s are comparable and hashable on purpose. We want to be able
+    to keep them in a `set` in order to prevent redundant recomputation.
+    `IndicatorBatch` is a convenient wrapper to enable this.
+
+    ## Examples
+
+    ### Singleton Constructor
+
+    ```
+    batch = IndicatorBatch.singleton(SimpleMovingAverage("Value", 21))
+    ```
+
+    ### Composition
+
+    #### Add one by one:
+
+    ```
+    batch = (
+        batch
+        << SimpleMovingAverage("Close", 89)
+        << LinearRegressionChannel("Close", 2.0)
+    )
+    ```
+
+    #### Union:
+
+    ```
+    batch = batch1 | batch2
+    ```
+
+    ### Length and Iteration
+
+    ```
+    i = 0
+    for indicator in batch:
+        i += 1
+    assert i == len(batch)
+    ```
+
+    ### Use
+
+    `IndicatorBatch` is itself (kind of) an indicator:
+
+    ```
+    if batch(candles):
+        print("These candles are great! Take two!")
+    ```
+    """
+
     @staticmethod
     def singleton(indicator: Indicator) -> IndicatorBatch:
         return IndicatorBatch([indicator])
@@ -52,18 +96,18 @@ class IndicatorBatch:
     def __init__(self, indicators: Iterable[Indicator]) -> None:
         self.indicators = set(indicators)
 
+    def __lshift__(self, other: Indicator) -> IndicatorBatch:
+        return IndicatorBatch(self.indicators.union([other]))
+
+    def __or__(self, other: IndicatorBatch) -> IndicatorBatch:
+        return IndicatorBatch(self.indicators.union(other.indicators))
+
     def __len__(self) -> int:
         return len(self.indicators)
 
     def __iter__(self) -> Iterator[Indicator]:
         for indicator in self.indicators:
             yield indicator
-
-    def __lshift__(self, other: Indicator) -> IndicatorBatch:
-        return IndicatorBatch(self.indicators.union([other]))
-
-    def __or__(self, other: IndicatorBatch) -> IndicatorBatch:
-        return IndicatorBatch(self.indicators.union(other.indicators))
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
         for indicator in self.indicators:
