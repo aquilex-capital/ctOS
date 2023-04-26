@@ -29,6 +29,7 @@ class Notifier:
         return wrapper
 
     def notify(self, text: str) -> Response:
+        log.info(text)
         return post(
             url=f"https://api.telegram.org/bot{self.bot_token}/sendMessage",
             json={
