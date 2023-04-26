@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import pandas as pd
 
 
@@ -27,3 +28,14 @@ IndicativeCandles = pd.DataFrame
 `Indicator`s produce `IndicativeCandles` - the composition of the original
 `Candles` with some additional columns.
 """
+
+
+@dataclass
+class CandleCache:
+    candles: Candles
+
+    def push(self, candle: Candle) -> None:
+        self.candles = pd.concat([self.candles, candle]).iloc[1:]
+
+    def view(self) -> Candles:
+        return self.candles.copy(deep=False)
