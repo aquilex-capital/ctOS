@@ -20,6 +20,9 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
     ) -> None:
         UMFutures.__init__(self, key=api_key, secret=api_secret)
         UMFuturesWebsocketClient.__init__(self)
+        self.x_info = dict(
+            [(symbol["symbol"], symbol) for symbol in self.exchange_info()["symbols"]]
+        )
 
     def candles(
         self,
@@ -73,3 +76,9 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             else []
         )
         return all_open, open_for_symbol
+
+    def price_precision(self, symbol: str) -> int:
+        return self.x_info[symbol]["pricePrecision"]
+
+    def quantity_precision(self, symbol: str) -> int:
+        return self.x_info[symbol]["quantityPrecision"]
