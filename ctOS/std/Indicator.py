@@ -82,8 +82,7 @@ class Indicators:
     `Indicators` is itself (kind of) an indicator:
 
     ```
-    if batch(candles):
-        print("These candles are great! Take two!")
+    indicative_candles = batch(candles)
     ```
     """
 
