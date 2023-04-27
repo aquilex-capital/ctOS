@@ -6,6 +6,7 @@ from binance.um_futures import UMFutures
 from binance.websocket.um_futures.websocket_client import UMFuturesWebsocketClient
 
 from ctOS.std.Candles import Candle, Candles
+from ctOS.func import always
 from . import normalize
 from .interval import Interval
 from .CandleStreamFilter import CandleStreamFilter
@@ -43,7 +44,7 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
         symbol: str,
         interval: Interval,
         callback: Callable[[Candle], None],
-        filter: CandleStreamFilter = lambda _: True,
+        filter: CandleStreamFilter = always,
     ) -> None:
         def is_ok(event: JSON.Object) -> bool:
             event_type = "e"

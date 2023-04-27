@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Callable, Iterable
+from typing import Callable
 
+from ctOS.func import identity
 from .Candles import Candles, IndicativeCandles
-from .Indicator import Indicator, IndicatorBatch, SimpleMovingAverage
+from .Indicator import IndicatorFunction, SimpleMovingAverage
 
 
 PredicateFunction = Callable[[IndicativeCandles], bool]
@@ -30,39 +31,30 @@ class Predicate:
 
     def __init__(
         self,
-        indicators: Iterable[Indicator],
         predicate: PredicateFunction,
+        indicator: IndicatorFunction = identity,
     ) -> None:
-        self.indicators = IndicatorBatch(indicators)
+        self.indicator = indicator
         self.predicate = predicate
 
     def __call__(self, candles: Candles) -> bool:
-        return self.predicate(self.indicators(candles))
+        return self.predicate(self.indicator(candles))
 
     def __invert__(self) -> Predicate:
-        return Predicate(self.indicators, lambda candles: not self.predicate(candles))
+        return Predicate(lambda candles: not self(candles))
 
     def __and__(self, other: Predicate) -> Predicate:
-        return Predicate(
-            self.indicators | other.indicators,
-            lambda candles: self.predicate(candles) and other.predicate(candles),
-        )
+        return Predicate(lambda candles: self(candles) and other(candles))
 
     def __or__(self, other: Predicate) -> Predicate:
-        return Predicate(
-            self.indicators | other.indicators,
-            lambda candles: self.predicate(candles) or other.predicate(candles),
-        )
+        return Predicate(lambda candles: self(candles) or other(candles))
 
 
 class LastClosePriceIsAboveSMA(Predicate):
     def __init__(self, window: int) -> None:
         column = "Close"
         self.SMA = f"SMA_{column}_{window}"
-        super().__init__(
-            indicators=[SimpleMovingAverage(column, window)],
-            predicate=self.predicate,
-        )
+        super().__init__(self.predicate, SimpleMovingAverage(column, window))
 
     def predicate(self, candles: IndicativeCandles) -> bool:
         last_candle = candles.iloc[-1]

@@ -1,10 +1,13 @@
 from __future__ import annotations
-from typing import Iterator, Iterable
+from typing import Iterator, Iterable, Callable
 from dataclasses import dataclass
 
 import numpy as np
 
 from .Candles import Candles, IndicativeCandles
+
+
+IndicatorFunction = Callable[[Candles], IndicativeCandles]
 
 
 @dataclass(unsafe_hash=True)
@@ -31,20 +34,20 @@ class Indicator:
         raise NotImplementedError
 
 
-class IndicatorBatch:
+class Indicators:
     """
     ## Overview
 
     The `Indicator`s are comparable and hashable on purpose. We want to be able
     to keep them in a `set` in order to prevent redundant recomputation.
-    `IndicatorBatch` is a convenient wrapper to enable this.
+    `Indicators` is a convenient wrapper to enable this.
 
     ## Examples
 
     ### Singleton Constructor
 
     ```
-    batch = IndicatorBatch.singleton(SimpleMovingAverage("Value", 21))
+    batch = Indicators(SimpleMovingAverage("Value", 21))
     ```
 
     ### Composition
@@ -76,7 +79,7 @@ class IndicatorBatch:
 
     ### Use
 
-    `IndicatorBatch` is itself (kind of) an indicator:
+    `Indicators` is itself (kind of) an indicator:
 
     ```
     if batch(candles):
@@ -84,18 +87,14 @@ class IndicatorBatch:
     ```
     """
 
-    @staticmethod
-    def singleton(indicator: Indicator) -> IndicatorBatch:
-        return IndicatorBatch([indicator])
-
-    def __init__(self, indicators: Iterable[Indicator]) -> None:
+    def __init__(self, *indicators: tuple[Indicator]) -> None:
         self.indicators = set(indicators)
 
-    def __lshift__(self, other: Indicator) -> IndicatorBatch:
-        return IndicatorBatch(self.indicators.union([other]))
+    def __lshift__(self, other: Indicator) -> Indicators:
+        return Indicators(self.indicators.union([other]))
 
-    def __or__(self, other: IndicatorBatch) -> IndicatorBatch:
-        return IndicatorBatch(self.indicators.union(other.indicators))
+    def __or__(self, other: Indicators) -> Indicators:
+        return Indicators(self.indicators.union(other.indicators))
 
     def __len__(self) -> int:
         return len(self.indicators)
