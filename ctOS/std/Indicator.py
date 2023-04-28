@@ -86,8 +86,8 @@ class Indicators:
     ```
     """
 
-    def __init__(self, *indicators: tuple[Indicator]) -> None:
-        self.indicators = set(indicators)
+    def __init__(self, *indicators) -> None:
+        self.indicators: set[Indicator] = set(indicators)
 
     def __lshift__(self, other: Indicator) -> Indicators:
         return Indicators(self.indicators.union([other]))
