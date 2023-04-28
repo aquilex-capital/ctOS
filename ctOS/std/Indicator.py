@@ -108,7 +108,7 @@ class Indicators:
         return candles
 
 
-@dataclass(eq=False)
+@dataclass(unsafe_hash=True)
 class SimpleMovingAverage(Indicator):
     column: str
     window: int
@@ -118,7 +118,7 @@ class SimpleMovingAverage(Indicator):
         return candles.assign(**{f"SMA_{self.column}_{self.window}": sma})
 
 
-@dataclass(eq=False)
+@dataclass(unsafe_hash=True)
 class ExponentialMovingAverage(Indicator):
     column: str
     window: int
@@ -128,7 +128,7 @@ class ExponentialMovingAverage(Indicator):
         return candles.assign(**{f"EMA_{self.column}_{self.window}": ema})
 
 
-@dataclass(eq=False)
+@dataclass(unsafe_hash=True)
 class LinearRegressionChannel(Indicator):
     column: str
     deviation: float
