@@ -63,12 +63,15 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             callback=middleware,
         )
 
+    def positions(self) -> JSON.ObjectList:
+        return self.account()["positions"]
+
     def open_positions(
         self, symbol: str = None
     ) -> tuple[JSON.ObjectList, Optional[JSON.Object]]:
         all_open = [
             position
-            for position in self.account()["positions"]
+            for position in self.positions()
             if float(position["positionAmt"]) != 0
         ]
         open_for_symbol = [
@@ -81,3 +84,13 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
 
     def quantity_precision(self, symbol: str) -> int:
         return self.x_info[symbol]["quantityPrecision"]
+
+    def position_size(self, symbol: str) -> float:
+        """
+        ```
+        = 0 => Position doesn't exist
+        < 0 => SELL position
+        > 0 => BUY position
+        ```
+        """
+        return next(filter(lambda p: p["symbol"] == symbol, self.positions()))
