@@ -93,4 +93,9 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
         > 0 => BUY position
         ```
         """
-        return next(filter(lambda p: p["symbol"] == symbol, self.positions()))
+        return next(
+            filter(
+                lambda p: p["symbol"] == symbol,
+                self.positions(),
+            )
+        )["positionAmt"]
