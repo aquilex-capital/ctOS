@@ -54,7 +54,7 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             if is_ok(event) and filter(kline := event["k"]):
                 callback(normalize.candle(kline))
             else:
-                log.warning("skipping candle stream event: " + str(event))
+                log.debug("skipping candle stream event: " + str(event))
 
         self.kline(
             id=0,
