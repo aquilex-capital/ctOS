@@ -101,3 +101,6 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
                 )
             )["positionAmt"]
         )
+
+    def all_symbols(self) -> list[str]:
+        return [each["symbol"] for each in self.exchange_info()["symbols"]]
