@@ -18,8 +18,9 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
         self,
         api_key: Optional[str] = None,
         api_secret: Optional[str] = None,
+        proxy: str = "https://fapi.binance.com",
     ) -> None:
-        UMFutures.__init__(self, key=api_key, secret=api_secret)
+        UMFutures.__init__(self, key=api_key, secret=api_secret, base_url=proxy)
         UMFuturesWebsocketClient.__init__(self)
         self.x_info = dict(
             [(symbol["symbol"], symbol) for symbol in self.exchange_info()["symbols"]]
