@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Iterator, Iterable, Callable
+from typing import Iterator, Callable
 from dataclasses import dataclass
 
 import numpy as np
