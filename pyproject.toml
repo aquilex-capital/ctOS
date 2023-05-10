@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ctos"
+version = "0.1.0"
+description = ""
+authors = ["Viktor A. Rozenko Voitenko <sharp.vik@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.0.1"
+numpy = "^1.24.3"
+binance-futures-connector = "^3.3.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.23.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
