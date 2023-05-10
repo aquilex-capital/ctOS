@@ -112,26 +112,29 @@ class Indicators:
 class SimpleMovingAverage(Indicator):
     column: str
     window: int
+    name: str = "SMA"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
         sma = candles[self.column].rolling(window=self.window).mean()
-        return candles.assign(**{f"SMA_{self.column}_{self.window}": sma})
+        return candles.assign(**{self.name: sma})
 
 
 @dataclass(unsafe_hash=True)
 class ExponentialMovingAverage(Indicator):
     column: str
     window: int
+    name: str = "EMA"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
         ema = candles[self.column].ewm(span=self.window, adjust=False).mean()
-        return candles.assign(**{f"EMA_{self.column}_{self.window}": ema})
+        return candles.assign(**{self.name: ema})
 
 
 @dataclass(unsafe_hash=True)
 class LinearRegressionChannel(Indicator):
     column: str
     deviation: float
+    name: str = "LRC"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
         series = candles[self.column]
@@ -150,8 +153,8 @@ class LinearRegressionChannel(Indicator):
 
         return candles.assign(
             **{
-                f"LRC_{self.column}_U": upper_channel,
-                f"LRC_{self.column}_M": y,
-                f"LRC_{self.column}_L": lower_channel,
+                f"{self.name}_U": upper_channel,
+                f"{self.name}_M": y,
+                f"{self.name}_L": lower_channel,
             }
         )
