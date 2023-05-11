@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from ctos.std.Candles import Candles, IndicativeCandles
+
 from .Candles import Candles, IndicativeCandles
 
 
@@ -156,5 +158,27 @@ class LinearRegressionChannel(Indicator):
                 f"{self.name}_U": upper_channel,
                 f"{self.name}_M": y,
                 f"{self.name}_L": lower_channel,
+            }
+        )
+
+
+@dataclass(unsafe_hash=True)
+class BollingerBands(Indicator):
+    column: str
+    window: int
+    deviation: float
+    name: str = "BB"
+
+    def __call__(self, candles: Candles) -> IndicativeCandles:
+        rolling = candles[self.column].rolling(self.window)
+        mean = rolling.mean()
+        std = rolling.std() * self.deviation
+        upper_band = mean + std
+        lower_band = mean - std
+        return candles.assign(
+            **{
+                f"{self.name}_U": upper_band,
+                f"{self.name}_M": mean,
+                f"{self.name}_L": lower_band,
             }
         )
