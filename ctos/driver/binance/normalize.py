@@ -6,7 +6,7 @@ from ctos.std.Candles import Candle, Candles
 from . import JSON
 
 
-def candles(klines: JSON.ObjectList) -> Candles:
+def candles(klines: JSON.ListOfObjects) -> Candles:
     """
     [
         {

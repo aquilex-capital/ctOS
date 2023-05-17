@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging as log
 from typing import Callable, Optional
+from datetime import datetime
 
 from binance.um_futures import UMFutures
 from binance.websocket.um_futures.websocket_client import UMFuturesWebsocketClient
@@ -9,7 +10,6 @@ from ctos.std.Candles import Candle, Candles
 from ctos.func import always
 from . import normalize
 from .interval import Interval
-from .CandleStreamFilter import CandleStreamFilter
 from . import JSON
 
 
@@ -40,12 +40,30 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             )
         )
 
+    def historical_candles(
+        self,
+        symbol: str,
+        interval: Interval,
+        start_time: datetime,
+        end_time: datetime = datetime.now(),
+        limit: int = 1500,  # ! This is also the maximum value
+    ):
+        return normalize.candles(
+            self.klines(
+                symbol=symbol,
+                interval=str(interval),
+                startTime=int(start_time.timestamp()) * 1000,
+                endTime=int(end_time.timestamp()) * 1000,
+                limit=limit,
+            )
+        )
+
     def stream_candles(
         self,
         symbol: str,
         interval: Interval,
         callback: Callable[[Candle], None],
-        filter: CandleStreamFilter = always,
+        filter: Callable[[JSON.Object], bool] = always,
     ) -> None:
         def is_ok(event: JSON.Object) -> bool:
             event_type = "e"
@@ -64,21 +82,22 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
             callback=middleware,
         )
 
-    def positions(self) -> JSON.ObjectList:
+    def positions(self) -> JSON.ListOfObjects:
         return self.account()["positions"]
 
-    def open_positions(
-        self, symbol: Optional[str] = None
-    ) -> tuple[JSON.ObjectList, Optional[JSON.Object]]:
-        all_open = [
+    def open_positions(self) -> JSON.ListOfObjects:
+        return [
             position
             for position in self.positions()
             if float(position["positionAmt"]) != 0
         ]
-        open_for_symbol = [
-            position for position in all_open if position["symbol"] == symbol
-        ]
-        return all_open, open_for_symbol[0] if open_for_symbol else None
+
+    def position(self, symbol: str) -> float:
+        try:
+            match = filter(lambda p: p["symbol"] == symbol, self.positions())
+            return float(next(match)["positionAmt"])
+        except StopIteration:
+            raise ValueError(f"Unknown symbol: {symbol}")
 
     def price_precision(self, symbol: str) -> int:
         return self.x_info[symbol]["pricePrecision"]
