@@ -291,3 +291,17 @@ class RateOfChange(Indicator):
             * 100
         )
         return candles.assign(**{self.name: roc})
+
+
+@dataclass(unsafe_hash=True)
+class AngularMomentumRatio(Indicator):
+    column: str
+    short_window: int
+    long_window: int
+    name: str = "AMR"
+
+    def __call__(self, candles: Candles) -> IndicativeCandles:
+        short_dy = candles.ewm(span=self.short_window, adjust=False).mean().diff()
+        long_dy = candles.ewm(span=self.long_window, adjust=False).mean().diff()
+        amr = short_dy / long_dy
+        return candles.assign(**{self.name: amr})
