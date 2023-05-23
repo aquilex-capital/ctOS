@@ -40,3 +40,11 @@ class CandleCache:
 
     def view(self) -> Candles:
         return self.candles.copy(deep=False)
+
+
+def candles_from_csv(path: str) -> Candles:
+    data = pd.read_csv(path)
+    data.CloseTime = pd.to_datetime(data.CloseTime)
+    data.OpenTime = pd.to_datetime(data.OpenTime)
+    data.set_index("CloseTime", inplace=True)
+    return data
