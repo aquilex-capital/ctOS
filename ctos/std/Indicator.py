@@ -301,7 +301,11 @@ class AngularMomentumRatio(Indicator):
     name: str = "AMR"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
-        short_dy = candles.ewm(span=self.short_window, adjust=False).mean().diff()
-        long_dy = candles.ewm(span=self.long_window, adjust=False).mean().diff()
+        short_dy = (
+            candles[self.column].ewm(span=self.short_window, adjust=False).mean().diff()
+        )
+        long_dy = (
+            candles[self.column].ewm(span=self.long_window, adjust=False).mean().diff()
+        )
         amr = short_dy / long_dy
         return candles.assign(**{self.name: amr})
