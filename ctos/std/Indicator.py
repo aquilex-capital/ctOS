@@ -167,7 +167,7 @@ class BollingerBands(Indicator):
     column: str
     window: int
     deviation: float
-    name: str = "BB"
+    name: str = "BOLL"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
         rolling = candles[self.column].rolling(self.window)
@@ -182,3 +182,31 @@ class BollingerBands(Indicator):
                 f"{self.name}_L": lower_band,
             }
         )
+
+
+@dataclass(unsafe_hash=True)
+class TrueStrengthIndex(Indicator):
+    column: str
+    long_window: int
+    short_window: int
+    name: str = "TSI"
+
+    def __call__(self, candles: Candles) -> IndicativeCandles:
+        price_change = candles[self.column].diff()
+        abs_price_change = price_change.abs()
+
+        price_change_double_smoothed = (
+            price_change.ewm(span=self.long_window, adjust=False)
+            .mean()
+            .ewm(span=self.short_window, adjust=False)
+            .mean()
+        )
+        abs_price_change_double_smoothed = (
+            abs_price_change.ewm(span=self.long_window, adjust=False)
+            .mean()
+            .ewm(span=self.short_window, adjust=False)
+            .mean()
+        )
+
+        tsi = price_change_double_smoothed / abs_price_change_double_smoothed
+        return candles.assign(**{self.name: tsi})
