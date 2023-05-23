@@ -230,3 +230,25 @@ class AbsolutePriceVolumeRatio(Indicator):
     def __call__(self, candles: Candles) -> IndicativeCandles:
         apvr = self.PVR(candles).PVR.abs()
         return candles.assign(**{self.name: apvr})
+
+
+@dataclass(unsafe_hash=True)
+class MeanAverageConvergenceDivergence(Indicator):
+    short_window: int
+    long_window: int
+    signal_window: int
+    name: str = "MACD"
+
+    def __call__(self, candles: Candles) -> IndicativeCandles:
+        ema_short = candles.ewm(span=self.short_window, adjust=False).mean()
+        ema_long = candles.ewm(span=self.long_window, adjust=False).mean()
+        macd_line = ema_short - ema_long
+        signal_line = macd_line.ewm(span=self.signal_window, adjust=False).mean()
+        macd_histogram = macd_line - signal_line
+        return candles.assign(
+            **{
+                self.name: macd_line,
+                f"{self.name}_SIGNAL": signal_line,
+                f"{self.name}_HIST": macd_histogram,
+            }
+        )
