@@ -66,7 +66,7 @@ class BinanceFutures(UMFutures, UMFuturesWebsocketClient):
         start_time: datetime,
         end_time: datetime,
         limit: int = 1500,  # ! This is also the maximum value
-    ):
+    ) -> Candles:
         return normalize.candles(
             self.klines(
                 symbol=symbol,
