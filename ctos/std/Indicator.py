@@ -210,3 +210,12 @@ class TrueStrengthIndex(Indicator):
 
         tsi = price_change_double_smoothed / abs_price_change_double_smoothed
         return candles.assign(**{self.name: tsi})
+
+
+@dataclass(unsafe_hash=True)
+class PriceVolumeRatio(Indicator):
+    name: str = "PVR"
+
+    def __call__(self, candles: Candles) -> IndicativeCandles:
+        pvr = abs(candles.Close - candles.Open) / candles.Volume
+        return candles.assign(**{self.name: pvr})
