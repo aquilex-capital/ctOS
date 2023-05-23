@@ -234,15 +234,18 @@ class AbsolutePriceVolumeRatio(Indicator):
 
 @dataclass(unsafe_hash=True)
 class MeanAverageConvergenceDivergence(Indicator):
+    column: str
     short_window: int
     long_window: int
     signal_window: int
     name: str = "MACD"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
-        ema_short = candles.ewm(span=self.short_window, adjust=False).mean()
-        ema_long = candles.ewm(span=self.long_window, adjust=False).mean()
-        macd_line = ema_short - ema_long
+        short_ema = (
+            candles[self.column].ewm(span=self.short_window, adjust=False).mean()
+        )
+        long_ema = candles[self.column].ewm(span=self.long_window, adjust=False).mean()
+        macd_line = short_ema - long_ema
         signal_line = macd_line.ewm(span=self.signal_window, adjust=False).mean()
         macd_histogram = macd_line - signal_line
         return candles.assign(
