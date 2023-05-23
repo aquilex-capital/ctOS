@@ -217,5 +217,16 @@ class PriceVolumeRatio(Indicator):
     name: str = "PVR"
 
     def __call__(self, candles: Candles) -> IndicativeCandles:
-        pvr = abs(candles.Close - candles.Open) / candles.Volume
+        pvr = (candles.Close - candles.Open) / candles.Volume
         return candles.assign(**{self.name: pvr})
+
+
+@dataclass(unsafe_hash=True)
+class AbsolutePriceVolumeRatio(Indicator):
+    PVR = PriceVolumeRatio()
+
+    name: str = "APVR"
+
+    def __call__(self, candles: Candles) -> IndicativeCandles:
+        apvr = self.PVR(candles).PVR.abs()
+        return candles.assign(**{self.name: apvr})
