@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ctos"
-version = "0.4.0"
+version = "0.4.1"
 description = ""
 authors = ["Viktor A. Rozenko Voitenko <sharp.vik@gmail.com>"]
 license = "MIT"

@@ -92,10 +92,10 @@ class Indicators:
         self.indicators: set[Indicator] = set(indicators)
 
     def __lshift__(self, other: Indicator) -> Indicators:
-        return Indicators(self.indicators.union([other]))
+        return Indicators(*self.indicators.union([other]))
 
     def __or__(self, other: Indicators) -> Indicators:
-        return Indicators(self.indicators.union(other.indicators))
+        return Indicators(*self.indicators.union(other.indicators))
 
     def __len__(self) -> int:
         return len(self.indicators)
